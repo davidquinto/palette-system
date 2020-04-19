@@ -1,6 +1,6 @@
 {
   "name": "palette-system",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "davidquinto @davidquinto",
   "bin": {
     "palette-system": "./bin/run"

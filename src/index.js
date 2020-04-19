@@ -10,15 +10,16 @@ const chalk = require("chalk");
 
 class PaletteSystemCommand extends Command {
   async run() {
-    const { args } = this.parse(PaletteSystemCommand);
+    const { args, flags } = this.parse(PaletteSystemCommand);
     const file = args.filename || "colors";
     const route = process.cwd() + "/" + file + ".json";
     const result = process.cwd() + "/styled-palette.json";
     console.log(
-      chalk.blue.bold.inverse("Reading from: ") + chalk.blue.bold(route)
+      chalk.blue.bold.inverse("Looking for: ") + chalk.blue.bold(route)
     );
     try {
       let rawdata = fs.readFileSync(route);
+      console.log(chalk.blue.bold.inverse("Processing..."));
       let colors = JSON.parse(rawdata);
       const entries = Object.entries(colors).reduce(
         (total, a) => ({
@@ -31,18 +32,23 @@ class PaletteSystemCommand extends Command {
         }),
         {}
       );
-      fs.writeFileSync(result, JSON.stringify(entries));
-      console.log(
-        chalk.green.bold.inverse("File created succesfully: ") +
-          chalk.green.bold(result)
-      );
+      if (flags.cli) {
+        console.log(JSON.stringify(entries));
+        console.log(chalk.green.bold.inverse("Done"));
+      } else {
+        fs.writeFileSync(result, JSON.stringify(entries));
+        console.log(
+          chalk.green.bold.inverse("File created succesfully: ") +
+            chalk.green.bold(result)
+        );
+      }
     } catch (error) {
       console.error(chalk.red(error));
     }
   }
 }
 
-PaletteSystemCommand.description = `Creates a styled-system color palette based on a json colors file.
+PaletteSystemCommand.description = `Create a styled-system color palette based on a json colors file.
 ...
 Without the cli flag, it generates a file called styled-palette.json
 `;
@@ -50,7 +56,7 @@ Without the cli flag, it generates a file called styled-palette.json
 PaletteSystemCommand.flags = {
   version: flags.version({ char: "v" }),
   help: flags.help({ char: "h" }),
-  cli: flags.help({
+  cli: flags.boolean({
     char: "c",
     description: "use this flag to `console.log` the output.",
   }),
